@@ -15,6 +15,7 @@ TASK_WS_CLOSED = "task-websocket-closed"
 
 class WebSocketHandler:
   LOOP_SLEEP_TIME = 0.3
+  SHOW_CANCEL_ERRORS = False
 
   def __init__(self, request, receive, send):
     self.request = request
@@ -60,12 +61,19 @@ class WebSocketHandler:
     if callback:
       task.add_done_callback(callback)
 
-    task.add_done_callback(self.log_tasks_exceptions)
+    task.add_done_callback(self.process_task_exception)
     self.tasks[task_id] = task
 
-  def log_tasks_exceptions(self, task):
+  def process_task_exception(self, task):
     error = task.exception()
     if error:
+      self.on_task_error(error)
+
+  def on_task_error(self, error):
+    if isinstance(error, asyncio.CancelledError) and self.SHOW_CANCEL_ERRORS:
+      logger.error("".join(traceback.format_exception(error)))
+
+    else:
       logger.error("".join(traceback.format_exception(error)))
 
   def cancel_tasks(self):
