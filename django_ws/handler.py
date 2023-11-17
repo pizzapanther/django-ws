@@ -70,8 +70,9 @@ class WebSocketHandler:
       self.on_task_error(error)
 
   def on_task_error(self, error):
-    if isinstance(error, asyncio.CancelledError) and self.SHOW_CANCEL_ERRORS:
-      logger.error("".join(traceback.format_exception(error)))
+    if isinstance(error, asyncio.CancelledError):
+      if self.SHOW_CANCEL_ERRORS:
+        logger.error("".join(traceback.format_exception(error)))
 
     else:
       logger.error("".join(traceback.format_exception(error)))
