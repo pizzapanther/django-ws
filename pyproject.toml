@@ -16,3 +16,7 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 version = { source = "file", path = "django_ws/version.py" }
+
+[tool.pdm.scripts]
+_.env_file = ".env"
+publish = "pdm publish --username __token__ --password $PDM_PUBLISH_PASSWORD_DWS"

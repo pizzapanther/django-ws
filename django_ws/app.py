@@ -1,7 +1,15 @@
 from django.conf import settings
 from django.core.asgi import get_asgi_application
+from django.core.handlers.asgi import ASGIRequest
 from django.urls import resolve
 from django.urls.exceptions import Resolver404
+
+
+class WebSocketRequest(ASGIRequest):
+  def __init__(self, scope, body_file):
+    self.scope = scope
+    self.scope['method'] = 'GET'
+    super().__init__(self.scope, body_file)
 
 
 def get_websocket_application(http_app=None):

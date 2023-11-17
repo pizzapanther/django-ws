@@ -7,18 +7,10 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
-from django.core.handlers.asgi import ASGIRequest
 from django.utils import timezone
 
 TASK_DUPLICATE_STARTED = "task-duplicate-started"
 TASK_WS_CLOSED = "task-websocket-closed"
-
-
-class WebSocketRequest(ASGIRequest):
-  def __init__(self, scope, body_file):
-    self.scope = scope
-    self.scope['method'] = 'GET'
-    super().__init__(self.scope, body_file)
 
 
 class WebSocketHandler:
