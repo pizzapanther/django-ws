@@ -1,0 +1,15 @@
+[project]
+name = "django-ws"
+version = "0.1.0"
+description = "Helpers for using WebSockets in Django"
+authors = [
+    {name = "Paul Bailey", email = "paul@neutron.studio"},
+]
+dependencies = []
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "BSD 3-Clause"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
