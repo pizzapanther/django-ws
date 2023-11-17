@@ -72,8 +72,9 @@ class WebSocketHandler:
       if self.PROCESS_CANCEL_ERRORS:
         self.on_task_error(ecancel)
 
-    if error:
-      self.on_task_error(error)
+    else:
+      if error:
+        self.on_task_error(error)
 
   def on_task_error(self, error):
     logger.error("".join(traceback.format_exception(error)))
