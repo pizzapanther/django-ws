@@ -10,8 +10,8 @@ Helpers for using WebSockets in Django
 
 ### asgi.py
 
-Remove line: `from django.core.asgi import get_asgi_application`
-Remove line: `application = get_asgi_application()`
+- Remove line: `from django.core.asgi import get_asgi_application`
+- Remove line: `application = get_asgi_application()`
 
 Add to the end:
 
