@@ -1,6 +1,6 @@
 [project]
 name = "django-ws"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Helpers for using WebSockets in Django"
 authors = [
     {name = "Paul Bailey", email = "paul@neutron.studio"},
@@ -13,3 +13,6 @@ license = {text = "BSD 3-Clause"}
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[tool.pdm]
+version = { source = "file", path = "django_ws/version.py" }
