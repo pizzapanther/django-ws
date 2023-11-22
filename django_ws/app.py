@@ -30,7 +30,7 @@ def get_websocket_application(http_app=None):
       else:
         request = WebSocketRequest(scope, None)
         ws = rmatch.func(request, receive, send, *rmatch.args, **rmatch.kwargs)
-        return await ws.run_loop()
+        return await ws.run_loop(ws)
 
     return await http_app(scope, receive, send)
 

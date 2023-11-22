@@ -5,6 +5,11 @@ import logging
 import json
 import traceback
 
+from django.conf import settings
+from django.utils.module_loading import import_string
+
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
+
 logger = logging.getLogger(__name__)
 
 from django.utils import timezone
@@ -17,10 +22,22 @@ class WebSocketHandler:
   LOOP_SLEEP_TIME = 0.3
   PROCESS_CANCEL_ERRORS = False
 
+  def __new__(cls, *args, **kwargs):
+    if not hasattr(cls, '_middleware'):
+      cls._middleware = []
+      cls._msg_middleware = []
+
+      if hasattr(settings, 'WS_MIDDLEWARE'):
+        for middleware_path in reversed(settings.WS_MIDDLEWARE):
+          middleware = import_string(middleware_path)
+          cls._middleware.append(middleware)
+
+    return super().__new__(cls)
+
   def __init__(self, request, receive, send):
     self.request = request
     self._receive = receive
-    self._send = send
+    self._send_coro = send
 
     self.connected = False
     self.closed = False
@@ -99,6 +116,16 @@ class WebSocketHandler:
   async def accept_connection(self):
     await self._send({'type': 'websocket.accept'})
 
+  async def _send(self, data):
+    try:
+      await self._send_coro(data)
+
+    except ConnectionClosedOK:
+      self.closed = True
+
+    except ConnectionClosedError:
+      self.closed = True
+
   async def send(self, data):
     await self._send({'type': 'websocket.send', 'text': json.dumps(data)})
 
@@ -114,31 +141,40 @@ class WebSocketHandler:
     self.closed = True
     await self._send({'type': 'websocket.close', 'code': code})
 
-  async def run_loop(self):
+  @staticmethod
+  async def run_loop(ws):
+    func = ws._run_loop
+    for m in ws._middleware:
+      func = m(func)
+
+    return await func(ws)
+
+  @staticmethod
+  async def _run_loop(ws):
     try:
       while 1:
-        msg = await self._receive()
+        msg = await ws._receive()
 
         if msg['type'] == 'websocket.connect':
-          await self.accept_connection()
-          self.connected = True
-          await self.on_open()
+          await ws.accept_connection()
+          ws.connected = True
+          await ws.on_open()
 
         elif msg['type'] == 'websocket.disconnect':
-          self.closed = True
+          ws.closed = True
 
         elif msg['type'] == 'websocket.receive':
-          await self.process_message(msg)
+          await ws.process_message(msg)
 
         else:
-          raise Exception('Unknown websocket event type: ' + event['type'])
+          raise Exception('Unknown websocket event type: ' + msg['type'])
 
-        if self.closed:
+        if ws.closed:
           break
 
     except Exception as error:
-      await self.on_error(error)
+      await ws.on_error(error)
       raise
 
-    self.cancel_tasks()
-    await self.on_close()
+    ws.cancel_tasks()
+    await ws.on_close()
