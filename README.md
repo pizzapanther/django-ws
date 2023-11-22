@@ -82,7 +82,7 @@ Does an infinite loop and sleeps for the given seconds after each sleep. Uses an
 
 Websockets in general follow a different lifecycle then HTTP requests.
 
-![websocket sequence](websocket-sequence.png)
+![websocket sequence](https://raw.githubusercontent.com/pizzapanther/django-ws/main/websocket-sequence.png)
 
 This means websockets in Django do not have a pre-established middleware mechanism. However, middleware is still helpful with websockets.
 
