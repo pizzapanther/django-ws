@@ -12,6 +12,9 @@ requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "BSD 3-Clause"}
 
+[project.urls]
+homepage = "https://github.com/pizzapanther/django-ws"
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
