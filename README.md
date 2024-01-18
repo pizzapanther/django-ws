@@ -48,7 +48,7 @@ class MySocket(WebSocketHandler):
     do_something_on_msg()
 
     # send json data
-    self.send({"reply": "sending data back"})
+    await self.send({"reply": "sending data back"})
 
   async def on_close(self):
     do_something_on_close()
